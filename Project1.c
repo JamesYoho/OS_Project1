@@ -1,0 +1,96 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <stdbool.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+
+int shell_change_dir(char *dir_path) {
+	if(chdir(dir_path) !=0){
+		return -1;
+	}
+	return 0;
+  // use the chdir() system call to change the current directory
+}
+
+
+int shell_file_exists(char *file_path) {
+	struct stat info;
+	if(stat(file_path, &info) == -1){
+		return -1;
+	}
+	return 0;
+  // use the stat() system call to check if a file exists
+}
+
+
+int shell_find_file(char *file_name, char *file_path, char file_path_size) {
+	char* path_name = getenv("PATH");
+	char* path_copy = strdup(path_name);
+
+	char* orginal_copy = path_copy;
+
+    char* dir;
+	while(true){
+        dir = strsep(&path_copy, ":");
+        if(dir == NULL){
+            free(orginal_copy);
+            return -1;
+        }
+        snprintf(file_path, file_path_size, "%s/%s", dir, file_name);
+        if(shell_file_exists(file_path)==0){
+            free(orginal_copy);
+            return 0;
+        }
+	}
+
+  // traverse the PATH environment variable to find the absolute path of a file/command
+}
+
+
+int shell_execute(char *file_path, char **argv) {
+
+	pid_t pid;
+	pid = fork();
+	if(pid == 0){
+		execv(file_path, argv);
+		return EXIT_FAILURE;
+	}
+	else{
+		wait(NULL);
+	}
+	return 0;
+
+  // execute the file with the command line arguments
+  // use the fork() and exec() system call 
+}
+
+
+int main (int argc, char *argv[]) {
+   //run the shell
+   
+   /*
+   while (!exit)
+   {
+	1. display prompt and wait for user input
+		// generate some prompt 
+		// e.g. username@hostname:~/david$ ping 
+	
+	2. filter out whitespace command 
+	
+	3. if command line contains non-whitespace characters
+	
+	4. parse command line
+		if the specified command is “exit”, terminate the program taking care to release any allocated resources.
+		if the specified command is “cd”
+			change the current working directory to the specified directory path using shell_change_dir()
+		if the command is specified using an absolute path (e.g. /usr/bin/ls), exists in the user’s PATH (e.g. ls) or exists in the current folder (e.g. ./hello_world)
+			execute the command using shell_execute()
+		else
+			report an error message
+    }
+   */
+}
