@@ -71,26 +71,54 @@ int shell_execute(char *file_path, char **argv) {
 
 int main (int argc, char *argv[]) {
    //run the shell
+   bool exit = false;
    
-   /*
    while (!exit)
    {
-	1. display prompt and wait for user input
+	//1. display prompt and wait for user input
 		// generate some prompt 
 		// e.g. username@hostname:~/david$ ping 
+	char command[256];
+	char cwd[256];
+	char file_path[256];
+		
+	printf("username@hostname:%s\n", getcwd(cwd, sizeof(cwd)));
+
+	fgets(command, sizeof(command), stdin);
+	//2. filter out whitespace command 
+	command[strcspn(command, "\n")] = 0;
 	
-	2. filter out whitespace command 
-	
-	3. if command line contains non-whitespace characters
-	
-	4. parse command line
-		if the specified command is “exit”, terminate the program taking care to release any allocated resources.
-		if the specified command is “cd”
-			change the current working directory to the specified directory path using shell_change_dir()
-		if the command is specified using an absolute path (e.g. /usr/bin/ls), exists in the user’s PATH (e.g. ls) or exists in the current folder (e.g. ./hello_world)
-			execute the command using shell_execute()
-		else
-			report an error message
+	char* words[256];
+	int numWords = 0;
+	char* word = strtok(command, " ");
+	while(word != NULL){
+		words[numWords] = word;
+		numWords++;
+		word = strtok(NULL, " ");
+	}
+
+	words[numWords] = NULL;
+	//3. if command line contains non-whitespace characters
+	if(numWords > 0){
+		if(numWords == 1 && strcmp(words[0], "exit") == 0){
+			exit = true;
+		} else if (numWords == 2 && strcmp(words[0], "cd") == 0){
+			shell_change_dir(words[1]);
+		} else if (numWords == 1 && shell_find_file(words[0], file_path, sizeof(file_path)) == 0){
+			shell_execute(file_path, words);
+		} else {
+			printf("Invalid Command\n");
+		}
+
+	}
+	// //4. parse command line
+	// 	if the specified command is “exit”, terminate the program taking care to release any allocated resources.
+	// 	if the specified command is “cd”
+	// 		change the current working directory to the specified directory path using shell_change_dir()
+	// 	if the command is specified using an absolute path (e.g. /usr/bin/ls), exists in the user’s PATH (e.g. ls) or exists in the current folder (e.g. ./hello_world)
+	// 		execute the command using shell_execute()
+	// 	else
+	// 		report an error message
     }
-   */
+   
 }
