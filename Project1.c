@@ -10,6 +10,7 @@
 
 int shell_change_dir(char *dir_path) {
 	if(chdir(dir_path) !=0){
+		printf("-bash: cd: %s: No such file or directory\n", dir_path);
 		return -1;
 	}
 	return 0;
@@ -40,6 +41,7 @@ int shell_find_file(char *file_name, char *file_path, char file_path_size) {
             free(orginal_copy);
             return -1;
         }
+
         snprintf(file_path, file_path_size, "%s/%s", dir, file_name);
         if(shell_file_exists(file_path)==0){
             free(orginal_copy);
