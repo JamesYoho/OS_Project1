@@ -83,6 +83,7 @@ int main (int argc, char *argv[]) {
 		
 	printf("username@hostname:%s$ ", getcwd(cwd, sizeof(cwd)));
 	fgets(command, sizeof(command), stdin);
+	fflush(stdout);
 	//2. filter out whitespace command 
 	command[strcspn(command, "\n")] = 0;
 	
