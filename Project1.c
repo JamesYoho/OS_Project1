@@ -27,7 +27,7 @@ int shell_file_exists(char *file_path) {
 }
 
 
-int shell_find_file(char *file_name, char *file_path, char file_path_size) {
+int shell_find_file(char *file_name, char *file_path, size_t file_path_size) {
 	char* path_name = getenv("PATH");
 	char* path_copy = strdup(path_name);
 
@@ -57,7 +57,7 @@ int shell_execute(char *file_path, char **argv) {
 	pid = fork();
 	if(pid == 0){
 		execv(file_path, argv);
-		return EXIT_FAILURE;
+		exit(EXIT_FAILURE);
 	}
 	else{
 		wait(NULL);
@@ -73,17 +73,15 @@ int main (int argc, char *argv[]) {
    //run the shell
    bool exit = false;
    
-   while (!exit)
-   {
+   while (!exit){
 	//1. display prompt and wait for user input
-		// generate some prompt 
-		// e.g. username@hostname:~/david$ ping 
+	// generate some prompt 
+	// e.g. username@hostname:~/david$ ping 
 	char command[256];
 	char cwd[256];
 	char file_path[256];
 		
-	printf("username@hostname:%s\n", getcwd(cwd, sizeof(cwd)));
-
+	printf("username@hostname:%s$ ", getcwd(cwd, sizeof(cwd)));
 	fgets(command, sizeof(command), stdin);
 	//2. filter out whitespace command 
 	command[strcspn(command, "\n")] = 0;
@@ -100,13 +98,33 @@ int main (int argc, char *argv[]) {
 	words[numWords] = NULL;
 	//3. if command line contains non-whitespace characters
 	if(numWords > 0){
-		if(numWords == 1 && strcmp(words[0], "exit") == 0){
+		if(strcmp(words[0], "exit") == 0){
 			exit = true;
-		} else if (numWords == 2 && strcmp(words[0], "cd") == 0){
-			shell_change_dir(words[1]);
-		} else if (numWords == 1 && shell_find_file(words[0], file_path, sizeof(file_path)) == 0){
+		} 
+		else if (strcmp(words[0], "cd") == 0){
+			if (numWords > 1){
+				shell_change_dir(words[1]);
+			}
+			else{
+				shell_change_dir(getenv("HOME"));
+			}
+		}
+		else if (strchr(words[0], '/')) {
+			// absolute or relative path
+			if (shell_file_exists(words[0]) == 0){
+				shell_execute(words[0], words);
+			}
+			else{
+				printf("Command not found\n");
+			}
+		}
+
+		else if (shell_find_file(words[0], file_path, sizeof(file_path)) == 0) {
+			// command found in PATH
 			shell_execute(file_path, words);
-		} else {
+		}
+
+		else {
 			printf("Invalid Command\n");
 		}
 
