@@ -27,7 +27,7 @@ int shell_file_exists(char *file_path) {
 }
 
 
-int shell_find_file(char *file_name, char *file_path, size_t file_path_size) {
+int shell_find_file(char *file_name, char *file_path, char file_path_size) {
 	char* path_name = getenv("PATH");
 	char* path_copy = strdup(path_name);
 
@@ -77,9 +77,9 @@ int main (int argc, char *argv[]) {
 	//1. display prompt and wait for user input
 	// generate some prompt 
 	// e.g. username@hostname:~/david$ ping 
-	char command[256];
-	char cwd[256];
-	char file_path[256];
+	char command[127];
+	char cwd[127];
+	char file_path[127];
 		
 	printf("username@hostname:%s$ ", getcwd(cwd, sizeof(cwd)));
 	fgets(command, sizeof(command), stdin);
@@ -119,7 +119,7 @@ int main (int argc, char *argv[]) {
 			}
 		}
 
-		else if (shell_find_file(words[0], file_path, sizeof(file_path)) == 0) {
+		else if (shell_find_file(words[0], file_path, (char)sizeof(file_path)) == 0) {
 			// command found in PATH
 			shell_execute(file_path, words);
 		}
